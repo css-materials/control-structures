@@ -1,0 +1,87 @@
+---
+title: "demo-for-loop"
+output: html_document
+date: '2023-10-23'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Example of using a for loop with a data frame. Goal: use a for loop to calculate the mean value for each column of a subset of the `palmerpenguins` data
+
+
+Load libraries and data
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+data(penguins)
+```
+
+
+Perform some initial data cleaning operations: select only variables of interest and remove missing data
+```{r}
+head(penguins)
+penguins_clean <- select(penguins, 3:6) %>% drop_na()
+head(penguins_clean)
+```
+
+
+We can reach our goal in two steps: first we calculate the mean value for each column in the data (task 1), then we save the results (task 2)
+
+
+TASK 1: calculate the means
+
+Our first instinct might be to write the following code, which seems to work...
+```{r}
+
+```
+
+
+...but the syntax is actually incorrect: the element `i` should be a number that runs from 1 to 4 (there are four columns in our data) but it is not, and we can verify it by printing `i` at every loop iteration
+```{r}
+
+```
+
+
+We should write code such that at every iteration of the loop the element `i` varies and it is a different column, like that:
+```{r}
+
+```
+
+Notice we use the `[[]]` because columns are lists: we need to access their elements
+```{r}
+
+```
+
+
+TASK 2: save the means
+
+To begin with, we want to use the `<-` operator to assign results to an object.
+
+Our first instinct might be to write the following code, but it won't work, why?
+```{r}
+
+```
+
+
+Instead, we first initialize an output vector outside the loop (notice `mode = "double"`: to initialize other types replace with "logical", "character" etc.)
+```{r}
+
+```
+
+
+Then, we loop through each column of the data frame, and each time we save the result in the output vector (notice here you do not need the `[[]]` for output, `[]` is enough, but they are often added for code syntax consistency)
+
+```{r}
+
+```
+And we are done!
+
+
+The code below shows the same operation using `seq_along()` which is a better option than `1:length(object)`: it creates a vector that contains a sequence of numbers from 1 to the length of the object,
+```{r}
+
+```
+
+
