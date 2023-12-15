@@ -1,5 +1,5 @@
 ---
-title: "demo-for-loop"
+title: "in-class-for-loop"
 output: html_document
 date: '2023-10-23'
 ---
@@ -8,8 +8,87 @@ date: '2023-10-23'
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Example of using a for loop with a data frame. Goal: use a for loop to calculate the mean value for each column of a subset of the `palmerpenguins` data
 
+# QUESTION 1: What is the difference between these two codes?
+
+Option 1 seems more intuitive, but option 2 makes it easier to access the looping index. 
+
+```{r iterate-over-vector-elements}
+plants <- c("monstera", "sanseveria", "photos")
+for (i in plants) {
+  print(i)
+}
+```
+
+```{r iterate-over-vector-indices}
+plants <- c("monstera", "sanseveria", "photos")
+for (i in 1:length(plants)) {  # for (i in seq_along(plants))
+  print(i)
+  print(plants[i])
+  print(paste(plants[i], "is on position", i))
+}
+```
+
+
+# QUESTION 2: How do you loop over a list instead than a vector?
+
+It is the same but to access elements of lists you need double `[[]]`
+
+```{r iterate-over-list-elements}
+plants <- c("monstera", "sanseveria", "photos")
+for (i in plants) {
+  print(i)
+}
+```
+
+```{r iterate-over-list-indices}
+plants <- list("monstera", "sanseveria", "photos")
+for (i in 1:length(plants)) {  # for (i in seq_along(plants))
+  print(i)
+  print(plants[[i]])
+  print(paste(plants[[i]], "is on position", i))
+}
+```
+
+
+# QUESTION 3: When to use a list VS a vector? 
+
+Main reasons are different data types, named elements, can change their length
+Exercise: modify the code above so using a list makes more sense than using a vector.
+
+
+# QUESTION 4: How do you loop over columns of a dataframe? 
+
+First, modify the previous code to create a toy dataframe
+```{r create-df}
+name <- c("monstera", "sanseveria", "photos")
+age <- c(5, 2, 1) 
+light <- c("moderate", "low", "moderate")
+(plants_df <- data.frame(Name = name, Age = age, Light = light)) 
+#class(plants_df)
+```
+
+Then iterate over its elements...
+```{r iterate-over-df-elements}
+for (i in plants_df) {
+  print(i)
+}
+```
+
+Does not quite work as expected... why? Instead, iterate over indices which corresponds to columns
+```{r}
+for (i in 1:length(plants_df)) {  # for (i in seq_along(plants_df))
+  print(i)
+  #print(plants_df[[i]])
+  print(paste(plants_df[[i]], "is in column", i))
+}
+
+```
+
+
+# EXAMPLE OF USING FOR LOOP TO CALCULATE MEAN OF COLUMNS OF PALMERPENGUINS DATAFRAME
+
+Goal: use a for loop to calculate the mean value for each column of a subset of the `palmerpenguins`
 
 Load libraries and data
 ```{r}
@@ -18,70 +97,76 @@ library(palmerpenguins)
 data(penguins)
 ```
 
-
-Perform some initial data cleaning operations: select only variables of interest and remove missing data
+Select only variables of interest and remove missing data
 ```{r}
 head(penguins)
 penguins_clean <- select(penguins, 3:6) %>% drop_na()
 head(penguins_clean)
 ```
 
+We can reach our goal in two steps: first we calculate the mean value for each column in the data (Step 1), then we save the results (Step 2)
 
-We can reach our goal in two steps: first we calculate the mean value for each column in the data (task 1), then we save the results (task 2)
-
-
-TASK 1: calculate the means
+Step 1: calculate the means
 
 Our first instinct might be to write the following code, which seems to work...
 ```{r}
-
+for (i in penguins_clean) {
+  print(mean(i))
+}
 ```
 
-
-...but the syntax is actually incorrect: the element `i` should be a number that runs from 1 to 4 (there are four columns in our data) but it is not, and we can verify it by printing `i` at every loop iteration
+...but it does not work as we might think it does!
+We expect the element `i` to be a number that runs from 1 to 4 because there are four columns in our data, but it is not. Let's verify it by printing `i` at every loop iteration
 ```{r}
-
+for (i in penguins_clean) {
+  print(i)
+  print(mean(i))
+}
 ```
 
-
-We should write code such that at every iteration of the loop the element `i` varies and it is a different column, like that:
+Instead, write code such that at every iteration of the loop the element `i` varies and is a different column
 ```{r}
-
+for (i in 1:length(penguins_clean)) {  # same as 1:4
+  print(i)
+  print(mean(penguins_clean[[i]]))
+}
 ```
 
-Notice we use the `[[]]` because columns are lists: we need to access their elements
+Notice the use of`[[]]` because columns are lists: we need to access their elements
 ```{r}
-
+is.list(penguins_clean)
 ```
 
+Step 2: save the means we calculated for each column
 
-TASK 2: save the means
-
-To begin with, we want to use the `<-` operator to assign results to an object.
-
-Our first instinct might be to write the following code, but it won't work, why?
+To begin with, use the `<-` operator to assign results to an object.
+We might be tempted to write the following code, but it won't work the way we expect it to work. Why?
 ```{r}
-
+for (i in 1:length(penguins_clean)) {  
+  output <- (mean(penguins_clean[[i]]))
+}
+output
 ```
 
-
-Instead, we first initialize an output vector outside the loop (notice `mode = "double"`: to initialize other types replace with "logical", "character" etc.)
+Instead, first initialize an output vector outside the loop (notice `mode = "double"`: to initialize other types replace with "logical", "character" etc.)
 ```{r}
-
+output <- vector(mode = "double" , length = length(penguins_clean)) 
+output
 ```
 
-
-Then, we loop through each column of the data frame, and each time we save the result in the output vector (notice here you do not need the `[[]]` for output, `[]` is enough, but they are often added for code syntax consistency)
-
+Then, loop through each column of the data frame, and each time we save the result in the output vector (notice here you do not need the `[[]]` for output, `[]` is enough, but they are often added for code syntax consistency)
 ```{r}
-
+for (i in 1:length(penguins_clean)) {
+  output[[i]] <- mean(penguins_clean[[i]])
+  print(output[[i]])
+}
+output
 ```
-And we are done!
-
 
 The code below shows the same operation using `seq_along()` which is a better option than `1:length(object)`: it creates a vector that contains a sequence of numbers from 1 to the length of the object,
 ```{r}
-
+for (i in seq_along(penguins_clean)) {
+  output[[i]] <- mean(penguins_clean[[i]])
+}
+output
 ```
-
-
