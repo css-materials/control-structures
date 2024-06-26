@@ -1,0 +1,128 @@
+---
+title: "For loops in-class demo"
+author: "Sabrina Nardin"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# QUESTION 1: What is the difference between these two codes?
+
+Option 1: iterate over vector elements
+```{r iterate-over-vector-elements}
+
+
+```
+
+Option 2: iterate over vector indices
+```{r iterate-over-vector-indices}
+
+
+```
+
+Option 1 seems more intuitive, but option 2 makes it easier to access the looping index. 
+
+
+# QUESTION 2: How do you loop over a list rather than a vector?
+
+In the code above, we iterated over vectors, either by their indices or elements. The logic is the same when iterating over lists, but the key difference is that you need to use double square brackets `[[]]` to access elements of a list, instead of single square brackets `[]`.
+```{r iterate-over-list-indices}
+
+```
+
+
+# QUESTION 3: How do you loop over columns of a dataframe? 
+
+First, modify the previous code to create a toy dataframe
+```{r create-df}
+
+name <- c("monstera", "sanseveria", "photos")
+age <- c(5, 2, 1) 
+light <- c("moderate", "low", "moderate")
+
+(plants_df <- data.frame(Name = name, Age = age, Light = light)) 
+
+class(plants_df)
+```
+
+Then iterate over its elements...
+```{r iterate-over-df-elements}
+
+```
+
+The code above doesn't work as expected. Why? 
+Instead, try iterating over the indices, which correspond to the data frame columns.
+```{r}
+
+```
+
+
+# EXAMPLE: Use a for loop to calculate the mean of each column in the penguins dataset
+
+Goal: use a for loop to calculate the mean value for each column of a subset of the `palmerpenguins`
+
+Load libraries and data
+```{r}
+library(tidyverse)
+library(palmerpenguins)
+data(penguins)
+```
+
+Select only variables of interest and remove missing data
+```{r}
+head(penguins)
+penguins_clean <- select(penguins, 3:6) %>% drop_na()
+head(penguins_clean)
+```
+
+We can reach our goal in two steps: calculate the mean value for each column in the data (Step 1); and store the results (Step 2)
+
+
+Step 1: calculate the mean for each column with a loop
+
+We might want to write the following code, which seems to work...
+```{r}
+
+```
+
+...but it doesn't work as expected! We expect the element `i` to be a number ranging from 1 to 4, corresponding to the four columns in our data. However, that's not what's happening. Let's verify this by printing `i` during each iteration of the loop.
+```{r}
+
+```
+
+Instead, write code such that at every iteration of the loop the element `i` varies and is a different column
+```{r}
+
+```
+
+Notice the use of `[[]]` because columns are lists: we need to access their elements
+```{r}
+
+```
+
+
+Step 2: save the means that we calculated for each column
+
+To begin with, use the `<-` operator to assign results to an object.
+We might be tempted to write the following code, but it won't work the way we expect it to work. Why?
+```{r}
+
+```
+
+Instead, first initialize an output vector outside the loop (notice `mode = "double"`: to initialize other types replace with "logical", "character", etc.)
+```{r}
+
+```
+
+Next, loop through each column of the data frame, saving the result in the output vector each time. Note that you can use `[]` for the output vector (because although the input is a list, the output is a vector, not a list!). However, `[[]]` is often used for syntax consistency.
+```{r}
+
+```
+
+The code below demonstrates the same operation using `seq_along()`, which is more common than `1:length(object)`: `seq_along()` creates a sequence of numbers from 1 to the length of the object.
+```{r}
+
+```
